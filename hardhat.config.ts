@@ -1,6 +1,7 @@
 import { HardhatUserConfig } from "hardhat/config";
 require("@matterlabs/hardhat-zksync-deploy");
 require("@matterlabs/hardhat-zksync-solc");
+require("@matterlabs/hardhat-zksync-chai-matchers");
 
 // dynamically changes endpoints for local tests
 const zkSyncTestnet = {
@@ -8,7 +9,7 @@ const zkSyncTestnet = {
   ethNetwork: "http://localhost:8545",
   allowUnlimitedContractSize: true,
   zksync: true,
-  name:"zkSync"
+  name: "zkSync",
 };
 // process.env.NODE_ENV == "test"
 //   ? {
@@ -27,7 +28,7 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {
       // @ts-ignore
-      zksync: true,
+      zksync: false,
     },
     zkSyncTestnet,
   },
