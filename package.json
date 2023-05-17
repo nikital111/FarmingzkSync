@@ -18,8 +18,5 @@
   },
   "scripts": {
     "test": "NODE_ENV=test hardhat test"
-  },
-  "dependencies": {
-    "@nomicfoundation/hardhat-network-helpers": "^1.0.8"
   }
 }

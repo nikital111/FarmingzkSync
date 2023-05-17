@@ -8,6 +8,7 @@ const zkSyncTestnet = {
   ethNetwork: "http://localhost:8545",
   allowUnlimitedContractSize: true,
   zksync: true,
+  name:"zkSync"
 };
 // process.env.NODE_ENV == "test"
 //   ? {
@@ -22,11 +23,6 @@ const zkSyncTestnet = {
 //     };
 
 const config: HardhatUserConfig = {
-  zksolc: {
-    version: "1.3.5",
-    compilerSource: "binary",
-    settings: {},
-  },
   defaultNetwork: "zkSyncTestnet",
   networks: {
     hardhat: {
