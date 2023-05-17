@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { Wallet, Contract, utils, Provider } from "zksync-web3";
+import { Wallet, Contract, utils, Provider, Signer, Web3Provider} from "zksync-web3";
 import * as hre from "hardhat";
 import { ethers } from "ethers";
 import { Deployer } from "@matterlabs/hardhat-zksync-deploy";
@@ -9,8 +9,11 @@ const RICH_WALLET_PK =
 const OTHER_RICH_WALLET =
   "0x3eb15da85647edd9a1159a4a13b9e7c56877c4eb33f614546d4db06a51868b1c";
 
+const provider = Provider.getDefaultProvider();
+
 const owner = new Wallet(RICH_WALLET_PK);
-const otherAccount = new Wallet(OTHER_RICH_WALLET);
+const otherAccount = new Wallet(OTHER_RICH_WALLET,provider);
+
 
 const deployer = new Deployer(hre, new Wallet(RICH_WALLET_PK));
 
@@ -110,18 +113,18 @@ describe("Farming", function () {
     expect(user1.rewardDebt.toNumber()).to.be.eq(0);
 
     //Deposit 2
-
     // transfer tokens and check balances
-    await TestToken.transfer(otherAccount.address, amountDepost2);
-
+    const transfer = await TestToken.transfer(otherAccount.address, amountDepost2);
+    await transfer.wait();
     const balance2Before = await TestToken.balanceOf(otherAccount.address);
     const balanceFarming2Before = await TestToken.balanceOf(Farming.address);
-
+    console.log(otherAccount._signerL2())
     // approve tokens for deposit
     await TestToken.connect(otherAccount._signerL2()).approve(
       Farming.address,
       amountDepost2
     );
+
 
     // deposit transaction
     const dep2Tx = await Farming.connect(otherAccount._signerL2()).deposit(
@@ -141,10 +144,10 @@ describe("Farming", function () {
     const balanceFarming2After = await TestToken.balanceOf(Farming.address);
 
     expect(balance2After.toNumber()).to.be.eq(
-      balance2Before.sub(amountDepost2).toNumber()
+      (balance2Before.sub(amountDepost2)).toNumber()
     );
     expect(balanceFarming2After.toNumber()).to.be.eq(
-      balanceFarming2Before.add(amountDepost2).toNumber()
+      (balanceFarming2Before.add(amountDepost2)).toNumber()
     );
 
     // verify state
