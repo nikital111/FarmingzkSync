@@ -421,7 +421,7 @@ const runTestsZkSync = () => {
       const totalRewards = Math.floor(
         totalRewards1 + totalRewards2 + totalRewards3 + totalRewards4
       );
-      console.log(totalRewards);
+      console.log(totalRewards, pendingRewards);
       expect(totalRewards).to.be.eq(pendingRewards);
     });
   });
