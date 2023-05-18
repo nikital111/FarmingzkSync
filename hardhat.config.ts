@@ -1,4 +1,7 @@
+process.env.NODE_ENV = "zkSync";
 import { HardhatUserConfig } from "hardhat/config";
+require("@nomicfoundation/hardhat-toolbox");
+require("@matterlabs/hardhat-zksync-toolbox");
 require("@matterlabs/hardhat-zksync-deploy");
 require("@matterlabs/hardhat-zksync-solc");
 require("@matterlabs/hardhat-zksync-chai-matchers");
@@ -7,24 +10,12 @@ require("@matterlabs/hardhat-zksync-chai-matchers");
 const zkSyncTestnet = {
   url: "http://localhost:3050",
   ethNetwork: "http://localhost:8545",
-  allowUnlimitedContractSize: true,
   zksync: true,
-  name: "zkSync",
 };
-// process.env.NODE_ENV == "test"
-//   ? {
-//       url: "http://localhost:3050",
-//       ethNetwork: "http://localhost:8545",
-//       zksync: true,
-//     }
-//   : {
-//       url: "https://zksync2-testnet.zksync.dev",
-//       ethNetwork: "goerli",
-//       zksync: true,
-//     };
 
 const config: HardhatUserConfig = {
-  defaultNetwork: "zkSyncTestnet",
+  defaultNetwork:
+    process.env.NODE_ENV == "zkSync" ? "zkSyncTestnet" : "hardhat",
   networks: {
     hardhat: {
       // @ts-ignore
