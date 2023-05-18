@@ -6,7 +6,6 @@ require("@matterlabs/hardhat-zksync-deploy");
 require("@matterlabs/hardhat-zksync-solc");
 require("@matterlabs/hardhat-zksync-chai-matchers");
 
-// dynamically changes endpoints for local tests
 const zkSyncTestnet = {
   url: "http://localhost:3050",
   ethNetwork: "http://localhost:8545",
