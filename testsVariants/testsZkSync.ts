@@ -111,8 +111,8 @@ const runTestsZkSync = () => {
       const time1 = event1?.args?.date;
 
       expect(event1?.args?.depositor).to.be.eq(owner.address);
-      expect(event1?.args?.deposit).to.be.eq(amountDepost1);
-      expect(event1?.args?.date).to.not.eq(0);
+      expect(event1?.args?.deposit.toNumber()).to.be.eq(amountDepost1);
+      expect(event1?.args?.date.toNumber()).to.not.eq(0);
 
       // check and verify balances after deposit
       const balance1After = await TestToken.balanceOf(owner.address);
@@ -192,16 +192,14 @@ const runTestsZkSync = () => {
 
       // Deposit 1
       const deposit1 = await Farming.deposit(amountDepost1);
-      await deposit1.wait();
+      await deposit1.waitFinalize();
       //Deposit 2
       const deposit2 = await Farming.connect(otherAccount._signerL2()).deposit(
         amountDepost2
       );
       await deposit2.wait();
-
-      // check total before claims
-      const total1 = await Farming.total();
-      expect(total1.toNumber()).to.be.eq(amountDepost1 + amountDepost2);
+            // check total before claims
+            const total1 = await Farming.total();
 
       // claim 1
 
@@ -220,13 +218,13 @@ const runTestsZkSync = () => {
       const claim1Tx = await Farming.claim();
 
       // find and verify event
-      const tx1 = await claim1Tx.wait(); // 0ms, as tx is already confirmed
+      const tx1 = await claim1Tx.wait();
       const event = tx1.events?.find((event) => event.event === "Claim");
 
       expect(event?.args?.recepient).to.be.eq(owner.address);
-      expect(event?.args?.deposit).to.be.eq(amountDepost1);
-      expect(event?.args?.rewards).to.not.eq(0);
-      expect(event?.args?.date).to.not.eq(0);
+      expect(event?.args?.deposit.toNumber()).to.be.eq(amountDepost1);
+      expect(event?.args?.rewards.toNumber()).to.not.eq(0);
+      expect(event?.args?.date.toNumber()).to.not.eq(0);
 
       // check and verify balances after claim
       const balance1After = await TestToken.balanceOf(owner.address);
@@ -260,6 +258,9 @@ const runTestsZkSync = () => {
 
       // claim 2
 
+      
+            expect(total1.toNumber()).to.be.eq(amountDepost1 + amountDepost2);
+
       // check balances before claim
       const balance2Before = await TestToken.balanceOf(otherAccount.address);
       const balanceFarming2Before = await TestToken.balanceOf(Farming.address);
@@ -279,9 +280,9 @@ const runTestsZkSync = () => {
       const event2 = tx2.events?.find((event) => event.event === "Claim");
 
       expect(event2?.args?.recepient).to.be.eq(otherAccount.address);
-      expect(event2?.args?.deposit).to.be.eq(amountDepost2);
-      expect(event2?.args?.rewards).to.not.eq(0);
-      expect(event2?.args?.date).to.not.eq(0);
+      expect(event2?.args?.deposit.toNumber()).to.be.eq(amountDepost2);
+      expect(event2?.args?.rewards.toNumber()).to.not.eq(0);
+      expect(event2?.args?.date.toNumber()).to.not.eq(0);
 
       // check and verify balances after claim
       const balance2After = await TestToken.balanceOf(otherAccount.address);
