@@ -1,0 +1,9 @@
+artifacts/
+artifacts-zk/
+cache/
+cache-zk/
+node_modules/
+local-setup/volumes/
+typechain-types/
+coverage/
+coverage.json
