@@ -40,7 +40,7 @@ async function deployContract(
 
 const runTestsZkSync = () => {
   describe("Farming", function () {
-    beforeEach("Deploy contracts", async () => {
+    before("Deploy tokens contracts", async () => {
       // deploy tokens for rewards and for deposits
       TestTokenReward = await deployContract(deployer, "TestTokenReward", [
         "A",
@@ -51,6 +51,16 @@ const runTestsZkSync = () => {
 
       await TestTokenReward.deployed();
       await TestToken.deployed();
+
+      // preparation
+
+      const transfer1 = await TestToken.transfer(otherAccount.address, 1000000);
+      await transfer1.wait();
+
+      const transfer2 = await TestToken.transfer(thirdAccount.address, 1000000);
+      await transfer2.wait();
+    });
+    beforeEach("Deploy Farming", async () => {
       // deploy farm
       Farming = await deployContract(deployer, "Farming", [
         TestTokenReward.address,
@@ -59,6 +69,23 @@ const runTestsZkSync = () => {
       ]);
 
       await Farming.deployed();
+
+      // preparation
+      const approve1 = await TestToken.approve(Farming.address, 1000000);
+      await approve1.wait();
+      const approve2 = await TestToken.connect(
+        otherAccount._signerL2()
+      ).approve(Farming.address, 1000000);
+      await approve2.wait();
+      const approve3 = await TestToken.connect(
+        thirdAccount._signerL2()
+      ).approve(Farming.address, 1000000);
+      await approve3.wait();
+      const transfer3 = await TestTokenReward.transfer(
+        Farming.address,
+        1000000
+      );
+      await transfer3.wait();
     });
 
     it("deposits", async function () {
@@ -70,23 +97,6 @@ const runTestsZkSync = () => {
 
       const total0 = await Farming.total();
       expect(total0.toNumber()).to.be.eq(0);
-
-      // preparation
-      // approve tokens for deposit
-      const approve1 = await TestToken.approve(Farming.address, amountDepost1);
-      await approve1.wait();
-
-      const approve2 = await TestToken.connect(
-        otherAccount._signerL2()
-      ).approve(Farming.address, amountDepost2);
-      await approve2.wait();
-
-      // transfer tokens for deposit
-      const transfer = await TestToken.transfer(
-        otherAccount.address,
-        amountDepost2
-      );
-      await transfer.wait();
 
       // Deposit 1
       // check balances before deposit
@@ -181,32 +191,14 @@ const runTestsZkSync = () => {
       const amountDepost2 = 250;
 
       // Deposit 1
-      const approve1 = await TestToken.approve(Farming.address, amountDepost1);
-      await approve1.wait();
       const deposit1 = await Farming.deposit(amountDepost1);
       await deposit1.wait();
       //Deposit 2
-
-      const transfer = await TestToken.transfer(
-        otherAccount.address,
-        amountDepost2
-      );
-      await transfer.wait();
-      const approve2 = await TestToken.connect(
-        otherAccount._signerL2()
-      ).approve(Farming.address, amountDepost2);
-      await approve2.wait();
       const deposit2 = await Farming.connect(otherAccount._signerL2()).deposit(
         amountDepost2
       );
       await deposit2.wait();
 
-      // transfer tokens for rewards
-      const transferRew = await TestTokenReward.transfer(
-        Farming.address,
-        100000
-      );
-      await transferRew.wait();
       // check total before claims
       const total1 = await Farming.total();
       expect(total1.toNumber()).to.be.eq(amountDepost1 + amountDepost2);
@@ -340,29 +332,6 @@ const runTestsZkSync = () => {
 
       const rewardsPerSec = (await Farming.rewardsPerSec()).toNumber();
 
-      // preparation
-      const approve1 = await TestToken.approve(Farming.address, amountDepost1);
-      await approve1.wait();
-      const transfer1 = await TestToken.transfer(
-        otherAccount.address,
-        amountDepost2
-      );
-      await transfer1.wait();
-      const approve2 = await TestToken.connect(
-        otherAccount._signerL2()
-      ).approve(Farming.address, amountDepost2);
-      await approve2.wait();
-      const transfer2 = await TestToken.transfer(
-        thirdAccount.address,
-        amountDepost3
-      );
-      await transfer2.wait();
-      const approve3 = await TestToken.connect(
-        thirdAccount._signerL2()
-      ).approve(Farming.address, amountDepost3);
-      await approve3.wait();
-      const transfer3 = await TestTokenReward.transfer(Farming.address, 100000);
-      await transfer3.wait();
       // Deposit 1
 
       const dep1Tx = await Farming.deposit(amountDepost1);
